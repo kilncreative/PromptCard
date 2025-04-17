@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptCard - Visual Prompt Engineering Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #965bf6;
+            --primary-light: #ab7ff8;
+            --primary-dark: #7d40f0;
+            --primary-bg: #f7f1ff;
+            --accent-green: #34D399;
+            --accent-blue: #60A5FA;
+            --dark: #121217;
+            --dark-grey: #21212b;
+            --grey: #8e8ea9;
+            --light-grey: #f6f6f6;
+            --border-light: rgba(255, 255, 255, 0.1);
+            --border-purple: rgba(150, 91, 246, 0.4);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --shadow-purple: 0 15px 30px rgba(150, 91, 246, 0.25);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: white;
+            line-height: 1.6;
+            background-color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 92%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+            position: relative;
+        }
+
+        header {
+            padding: 1.5rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: background-color 0.3s, padding 0.3s;
+        }
+
+        .header-scrolled {
+            background-color: rgba(18, 18, 23, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo svg {
+            width: 32px;
+            height: 32px;
+            margin-right: 0.5rem;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            position: relative;
+            transition: color 0.2s;
+            opacity: 0.8;
+        }
+
+        nav a:hover {
+            opacity: 1;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-outline {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            background: transparent;
+            margin-right: 1rem;
+        }
+
+        .btn-outline:hover {
+            border-color: white;
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            box-shadow: var(--shadow-purple);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 180px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 30%, rgba(150, 91, 246, 0.15), transparent 60%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-tagline {
+            display: inline-block;
+            background-color: rgba(150, 91, 246, 0.1);
+            color: var(--primary-light);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-purple);
+        }
+
+        .hero h1 {
+            font-size: 3.75rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #ffffff, #b496fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2.5rem;
+            max-width: 550px;
+        }
+
+        .hero-btns {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .hero-image-container {
+            position: absolute;
+            right: -5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60%;
+            max-width: 800px;
+            perspective: 1000px;
+            z-index: 1;
+        }
+
+        .hero-image {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            transform: rotateY(-5deg) rotateX(5deg);
+            transition: transform 0.5s ease;
+            border: 1px solid var(--border-light);
+            opacity: 0.9;
+        }
+
+        .hero-image:hover {
+            transform: rotateY(0) rotateX(0);
+        }
+
+        /* Cards Section */
+        .cards-flow {
+            padding: 100px 0;
+            background-color: var(--dark-grey);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cards-flow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, rgba(150, 91, 246, 0.1), transparent 60%);
+            pointer-events: none;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 5rem;
+        }
+
+        .section-subtitle {
+            color: var(--primary-light);
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+
+        .section-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.125rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cards-container {
+            position: relative;
+            min-height: 500px;
+        }
+
+        .prompt-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 300px;
+            position: absolute;
+            transition: all 0.5s ease;
+            cursor: grab;
+            backdrop-filter: blur(5px);
+        }
+
+        .prompt-card:nth-child(1) {
+            top: 50px;
+            left: 10%;
+            transform: rotate(-5deg);
+            z-index: 3;
+            background: linear-gradient(145deg, rgba(150, 91, 246, 0.2), rgba(150, 91, 246, 0.05));
+        }
+
+        .prompt-card:nth-child(2) {
+            top: 150px;
+            left: 25%;
+            transform: rotate(3deg);
+            z-index: 2;
+            background: linear-gradient(145deg, rgba(96, 165, 250, 0.2), rgba(96, 165, 250, 0.05));
+        }
+
+        .prompt-card:nth-child(3) {
+            top: 80px;
+            left: 45%;
+            transform: rotate(-2deg);
+            z-index: 4;
+            background: linear-gradient(145deg, rgba(52, 211, 153, 0.2), rgba(52, 211, 153, 0.05));
+        }
+
+        .prompt-card:nth-child(4) {
+            top: 180px;
+            left: 65%;
+            transform: rotate(4deg);
+            z-index: 1;
+            background: linear-gradient(145deg, rgba(249, 168, 212, 0.2), rgba(249, 168, 212, 0.05));
+        }
+
+        .prompt-card:hover {
+            transform: translateY(-10px) rotate(0);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-icon {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin-right: 0.75rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .card-content {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Features Grid */
+        .features {
+            padding: 150px 0;
+            background-color: var(--dark);
+            position: relative;
+        }
+
+        .features::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 30%, rgba(150, 91, 246, 0.1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+
+        .feature-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 2.5rem 2rem;
+            transition: all 0.3s ease;
+            height: 100%;
+            backdrop-filter: blur(5px);
+        }
+
+        .feature-item:hover {
+            transform: translateY(-8px);
+            border-color: var(--border-purple);
+            box-shadow: var(--shadow-md);
+            background: rgba(150, 91, 246, 0.05);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(150, 91, 246, 0.1);
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+
+        .feature-icon svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        /* Process Section */
+        .process {
+            padding: 150px 0;
+            background-color: var(--dark-grey);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 50%, rgba(150, 91, 246, 0.15), transparent 60%);
+            pointer-events: none;
+        }
+
+        .process-steps {
+            display: flex;
+            gap: 2rem;
+            margin-top: 6rem;
+            position: relative;
+        }
+
+        .process-steps::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            width: calc(100% - 80px);
+            height: 2px;
+            background: linear-gradient(to right, var(--primary), var(--accent-green));
+            z-index: 0;
+        }
+
+        .process-step {
+            flex: 1;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-purple);
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .process-step:hover .step-number {
+            transform: scale(1.1);
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .step-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            max-width: 250px;
+            line-height: 1.6;
+        }
+
+        /* Metrics Section */
+        .metrics {
+            padding: 150px 0;
+            background-color: var(--dark);
+            position: relative;
+        }
+
+        .metrics::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 70% 40%, rgba(150, 91, 246, 0.15), transparent 60%);
+            pointer-events: none;
+        }
+
+        .metrics-content {
+            display: flex;
+            align-items: center;
+            gap: 5rem;
+            margin-top: 6rem;
+        }
+
+        .metrics-image {
+            flex: 1;
+            position: relative;
+        }
+
+        .metrics-chart {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            transition: transform 0.5s ease;
+        }
+
+        .metrics-info {
+            flex: 1;
+        }
+
+        .metric-item {
+            margin-bottom: 3rem;
+        }
+
+        .metric-title {
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .metric-title svg {
+            width: 24px;
+            height: 24px;
+            margin-right: 0.75rem;
+            color: var(--primary);
+        }
+
+        .metric-description {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.125rem;
+            line-height: 1.7;
+            padding-left: 2.25rem;
+        }
+
+        /* CTA Section */
+        .cta {
+            padding: 150px 0;
+            background: linear-gradient(135deg, #1e1b33, #121217);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(150, 91, 246, 0.15), transparent 60%);
+            pointer-events: none;
+        }
+
+        .cta-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta h2 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            background: linear-gradient(to right, #ffffff, #b496fa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta p {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .cta-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .cta-input {
+            flex: 1;
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.5rem 0 0 0.5rem;
+            border: 1px solid var(--border-light);
+            background-color: rgba(255, 255, 255, 0.05);
+            font-size: 1rem;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .cta-input:focus {
+            border-color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .cta-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .cta-btn {
+            padding: 1.25rem 2rem;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 600;
+            border: none;
+            border-radius: 0 0.5rem 0.5rem 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            background: linear-gradient(to right, var(--primary-dark), var(--primary-dark));
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            padding: 5rem 0 2rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 4rem;
+            margin-bottom: 4rem;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-logo svg {
+            width: 28px;
+            height: 28px;
+            margin-right: 0.5rem;
+        }
+
+        .footer-tagline {
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-description {
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            transition: all 0.3s;
+            text-decoration: none;
+            border: 1px solid var(--border-light);
+        }
+
+        .social-icon:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .social-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .footer-heading {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-light);
+            transform: translateX(3px);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.875rem;
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-bottom-links a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-bottom-links a:hover {
+            color: white;
+        }
+
+        /* Floating Elements */
+        .floating-badge {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            z-index: 5;
+            transition: transform 0.5s ease;
+        }
+
+        .badge-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .badge-content {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .badge-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.25rem;
+        }
+
+        .badge-value {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .star-rating {
+            display: flex;
+            margin-top: 0.25rem;
+        }
+
+        .star-rating svg {
+            width: 12px;
+            height: 12px;
+            color: #FBBF24;
+            margin-right: 0.25rem;
+        }
+
+        /* Badges positioning */
+        .metrics-badge-1 {
+            top: 20%;
+            left: -80px;
+            background: linear-gradient(145deg, rgba(150, 91, 246, 0.2), rgba(150, 91, 246, 0.05));
+        }
+
+        .metrics-badge-2 {
+            bottom: 15%;
+            right: -60px;
+            background: linear-gradient(145deg, rgba(52, 211, 153, 0.2), rgba(52, 211, 153, 0.05));
+        }
+
+        .floating-badge:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark);
+            z-index: 1001;
+            padding: 2rem;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        .mobile-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .mobile-menu-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .mobile-nav ul {
+            list-style: none;
+        }
+
+        .mobile-nav li {
+            margin-bottom: 1.5rem;
+        }
+
+        .mobile-nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: block;
+            padding: 0.5rem 0;
+        }
+
+        .mobile-actions {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1200px) {
+            .hero h1 {
+                font-size: 3.25rem;
+            }
+
+            .hero-image-container {
+                width: 55%;
+            }
+
+            .process-steps::before {
+                left: 30px;
+                width: calc(100% - 60px);
+            }
+
+            .step-number {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1.5fr repeat(3, 1fr);
+                gap: 3rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .hero {
+                padding: 150px 0 400px;
+            }
+
+            .hero-content {
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .hero p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-btns {
+                justify-content: center;
+            }
+
+            .hero-image-container {
+                top: auto;
+                right: auto;
+                bottom: -300px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 90%;
+                max-width: 600px;
+            }
+
+            .process-steps {
+                flex-direction: column;
+                gap: 4rem;
+            }
+
+            .metrics-chart {
+                max-width: 100%;
+            }
+
+            .floating-badge {
+                display: none;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 3rem 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header nav,
+            header .header-actions {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.125rem;
+            }
+
+            .section-title {
+                font-size: 2.25rem;
+            }
+
+            .feature-item {
+                padding: 2rem 1.5rem;
+            }
+
+            .cards-container {
+                display: flex;
+                flex-direction: column;
+                gap: 1.5rem;
+                min-height: auto;
+            }
+
+            .prompt-card {
+                position: relative;
+                width: 100%;
+                top: auto;
+                left: auto;
+                transform: none;
+            }
+
+            .cta h2 {
+                font-size: 2.5rem;
+            }
+
+            .cta-form {
+                flex-direction: column;
+            }
+
+            .cta-input {
+                border-radius: 0.5rem;
+                margin-bottom: 1rem;
+            }
+
+            .cta-btn {
+                border-radius: 0.5rem;
+                width: 100%;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .footer-bottom-links {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header id="header">
+        <div class="container header-container">
+            <a href="#" class="logo">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="#965bf6" />
+                    <path d="M24 10H8C7.44772 10 7 10.4477 7 11V21C7 21.5523 7.44772 22 8 22H24C24.5523 22 25 21.5523 25 21V11C25 10.4477 24.5523 10 24 10Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M10 14H22" stroke="white" stroke-width="2" stroke-linecap="round" />
+                    <path d="M10 18H18" stroke="white" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                PromptCard
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#process">How it Works</a></li>
+                    <li><a href="#metrics">Results</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </nav>
+            <div class="header-actions">
+                <a href="#cta" class="btn btn-outline">Log In</a>
+                <a href="#cta" class="btn btn-primary">Get Started</a>
+            </div>
+            <button class="mobile-menu-toggle">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 6H20M4 12H20M4 18H20" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu">
+        <div class="mobile-menu-header">
+            <a href="#" class="logo">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="#965bf6" />
+                    <path d="M24 10H8C7.44772 10 7 10.4477 7 11V21C7 21.5523 7.44772 22 8 22H24C24.5523 22 25 21.5523 25 21V11C25 10.4477 24.5523 10 24 10Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M10 14H22" stroke="white" stroke-width="2" stroke-linecap="round" />
+                    <path d="M10 18H18" stroke="white" stroke-width="2" stroke-linecap="round" />
+                </svg>
+                PromptCard
+            </a>
+            <button class="mobile-menu-close">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        </div>
+        <nav class="mobile-nav">
+            <ul>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#process">How it Works</a></li>
+                <li><a href="#metrics">Results</a></li>
+                <li><a href="#about">About</a></li>
+            </ul>
+        </nav>
+        <div class="mobile-actions">
+            <a href="#cta" class="btn btn-outline">Log In</a>
+            <a href="#cta" class="btn btn-primary">Get Started</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-content">
+                <span class="hero-tagline">Build. Test. Optimize. Accelerate.</span>
+                <h1>Engineer AI Prompts with Scientific Precision</h1>
+                <p>PromptCard transforms prompt engineering from art to science, with a visual platform for crafting, testing, and continuously improving AI interactions.</p>
+                <div class="hero-btns">
+                    <a href="#cta" class="btn btn-primary">Request Demo</a>
+                    <a href="#features" class="btn btn-outline">Explore Features</a>
+                </div>
+            </div>
+            <div class="hero-image-container">
+                <img src="/api/placeholder/800/500" alt="PromptCard Interface" class="hero-image" />
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="about">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="32" height="32" rx="8" fill="#965bf6" />
+                            <path d="M24 10H8C7.44772 10 7 10.4477 7 11V21C7 21.5523 7.44772 22 8 22H24C24.5523 22 25 21.5523 25 21V11C25 10.4477 24.5523 10 24 10Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M10 14H22" stroke="white" stroke-width="2" stroke-linecap="round" />
+                            <path d="M10 18H18" stroke="white" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                        <span>PromptCard</span>
+                    </div>
+                    <h3 class="footer-tagline">Build. Test. Optimize. Accelerate.</h3>
+                    <p class="footer-description">PromptCard is transforming how organizations approach AI implementation by providing tools that make systematic improvement possible for teams of all sizes.</p>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M18 2H15C13.6739 2 12.4021 2.52678 11.4645 3.46447C10.5268 4.40215 10 5.67392 10 7V10H7V14H10V22H14V14H17L18 10H14V7C14 6.73478 14.1054 6.48043 14.2929 6.29289C14.4804 6.10536 14.7348 6 15 6H18V2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M23 3C22.0424 3.67548 20.9821 4.19211 19.86 4.53C19.2577 3.83751 18.4573 3.34669 17.567 3.12393C16.6767 2.90116 15.7395 2.9572 14.8821 3.28445C14.0247 3.61169 13.2884 4.1944 12.773 4.95372C12.2575 5.71303 11.9877 6.61234 12 7.53V8.53C10.2426 8.57557 8.50127 8.18581 6.93101 7.39545C5.36074 6.60508 4.01032 5.43864 3 4C3 4 -1 13 8 17C5.94053 18.398 3.48716 19.0989 1 19C10 24 21 19 21 7.5C20.9991 7.22145 20.9723 6.94359 20.92 6.67C21.9406 5.66349 22.6608 4.39271 23 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                        <a href="#" class="social-icon">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 8C17.5913 8 19.1174 8.63214 20.2426 9.75736C21.3679 10.8826 22 12.4087 22 14V21H18V14C18 13.4696 17.7893 12.9609 17.4142 12.5858C17.0391 12.2107 16.5304 12 16 12C15.4696 12 14.9609 12.2107 14.5858 12.5858C14.2107 12.9609 14 13.4696 14 14V21H10V14C10 12.4087 10.6321 10.8826 11.7574 9.75736C12.8826 8.63214 14.4087 8 16 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M6 9H2V21H6V9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M4 6C5.10457 6 6 5.10457 6 4C6 2.89543 5.10457 2 4 2C2.89543 2 2 2.89543 2 4C2 5.10457 2.89543 6 4 6Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#hero">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#process">How It Works</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Resources</h4>
+                    <ul class="footer-links">
+                        <li><a href="#cta">Request Demo</a></li>
+                        <li><a href="#metrics">Results</a></li>
+                        <li><a href="#features">Platform</a></li>
+                        <li><a href="#cards">Capabilities</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-heading">Legal</h4>
+                    <ul class="footer-links">
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                        <li><a href="#cookies">Cookie Policy</a></li>
+                        <li><a href="#compliance">AI Compliance</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <div class="copyright">
+                    &copy; 2025 PromptCard. All rights reserved.
+                </div>
+                <div class="footer-bottom-links">
+                    <a href="#privacy">Privacy</a>
+                    <a href="#terms">Terms</a>
+                    <a href="#contact">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Interactive Elements -->
+    <script>
+        // Header scroll effect
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('header-scrolled');
+            } else {
+                header.classList.remove('header-scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+        const mobileMenuClose = document.querySelector('.mobile-menu-close');
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const mobileMenuLinks = document.querySelectorAll('.mobile-nav a');
+
+        mobileMenuToggle.addEventListener('click', function() {
+            mobileMenu.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        mobileMenuClose.addEventListener('click', function() {
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Key Capabilities</span>
+                <h2 class="section-title">The Science of Better AI Interactions</h2>
+                <p class="section-description">PromptCard brings structure, measurement, and continuous improvement to prompt engineering with powerful features.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9 12H15M12 9V15M3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Visual Prompt Building</h3>
+                    <p class="feature-description">Create complex prompts with an intuitive drag-and-drop interface. Arrange, connect, and nest reusable components from our comprehensive library.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 4V16M16 16L19 13M16 16L13 13M8 8V20M8 20L11 17M8 20L5 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Five-Dimension Evaluation</h3>
+                    <p class="feature-description">Measure AI responses across five key dimensions of quality: language style, emotional register, knowledge boundaries, value alignment, and behavioral consistency.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3 7C3 6.46957 3.21071 5.96086 3.58579 5.58579C3.96086 5.21071 4.46957 5 5 5H19C19.5304 5 20.0391 5.21071 20.4142 5.58579C20.7893 5.96086 21 6.46957 21 7V17C21 17.5304 20.7893 18.0391 20.4142 18.4142C20.0391 18.7893 19.5304 19 19 19H5C4.46957 19 3.96086 18.7893 3.58579 18.4142C3.21071 18.0391 3 17.5304 3 17V7Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M3 7L12 13L21 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">RAG Integration</h3>
+                    <p class="feature-description">Connect your knowledge sources and test retrieval-augmented generation alongside core prompt performance, measuring information retrieval accuracy and relevance.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">A/B Testing</h3>
+                    <p class="feature-description">Conduct controlled experiments by isolating variables between prompt variants. Identify which specific elements have the greatest impact on response quality.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M3.6001 9H20.4001" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M3.6001 15H20.4001" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M12 3C14.0683 5.25021 15.1788 8.0935 15.1788 12C15.1788 15.9065 14.0683 18.7498 12 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                            <path d="M12 3C9.93173 5.25021 8.82119 8.0935 8.82119 12C8.82119 15.9065 9.93173 18.7498 12 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Knowledge Repository</h3>
+                    <p class="feature-description">Build organizational expertise about what works. Automatically track patterns and create a searchable library of effective prompt components and structures.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M9.99999 16.2L5.79999 12L4.39999 13.4L9.99999 19L20.6 8.4L19.2 7L9.99999 16.2Z" fill="currentColor" />
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">AI-Powered Optimization</h3>
+                    <p class="feature-description">Let AI improve itself. Our system can generate prompt variations, test them automatically, measure performance, and intelligently refine based on results.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Section -->
+    <section class="process" id="process">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">The Method</span>
+                <h2 class="section-title">From Random Testing to Systematic Improvement</h2>
+                <p class="section-description">A structured approach to developing high-performance prompts in four powerful steps.</p>
+            </div>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title">Build</h3>
+                    <p class="step-description">Assemble prompt components visually using our drag-and-drop timeline editor and component library.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title">Test</h3>
+                    <p class="step-description">Execute prompts with multiple runs against different AI models to generate response variations.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title">Measure</h3>
+                    <p class="step-description">Evaluate responses across five dimensions of quality to quantify performance with precision.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title">Improve</h3>
+                    <p class="step-description">Refine prompts based on measurements, build institutional knowledge, and automate optimization.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Metrics Section -->
+    <section class="metrics" id="metrics">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Measurable Results</span>
+                <h2 class="section-title">Transform Guesswork into Science</h2>
+                <p class="section-description">Move beyond trial and error with data-driven insights about what actually works in prompt engineering.</p>
+            </div>
+            <div class="metrics-content">
+                <div class="metrics-image">
+                    <img src="/api/placeholder/600/400" alt="Performance Metrics" class="metrics-chart" />
+                    <div class="floating-badge metrics-badge-1">
+                        <div class="badge-icon" style="background: rgba(150, 91, 246, 0.2);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M16 4V16M16 16L19 13M16 16L13 13M8 8V20M8 20L11 17M8 20L5 17" stroke="#965bf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="badge-content">
+                            <span class="badge-label">Improvement Rate</span>
+                            <span class="badge-value">+42%</span>
+                        </div>
+                    </div>
+                    <div class="floating-badge metrics-badge-2">
+                        <div class="badge-icon" style="background: rgba(52, 211, 153, 0.2);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 6V12L16 14M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="badge-content">
+                            <span class="badge-label">Development Time</span>
+                            <span class="badge-value">-60%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metrics-info">
+                    <div class="metric-item">
+                        <h3 class="metric-title">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            End Random Testing
+                        </h3>
+                        <p class="metric-description">Replace blind trial-and-error with controlled experiments that isolate variables and measure specific impacts on AI outputs across five key dimensions.</p>
+                    </div>
+                    <div class="metric-item">
+                        <h3 class="metric-title">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 6V12L16 14M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            Reduce Development Time
+                        </h3>
+                        <p class="metric-description">Teams using PromptCard report 40-60% faster development cycles for production-ready prompts, with significantly higher consistency in AI responses.</p>
+                    </div>
+                    <div class="metric-item">
+                        <h3 class="metric-title">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 9L12 16L5 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            Build Institutional Knowledge
+                        </h3>
+                        <p class="metric-description">Transform tribal knowledge into a systematic library of what works. Create reusable components that consistently produce high-quality AI interactions.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Transform Your AI Development</h2>
+                <p>Join forward-thinking teams building better AI experiences through scientific prompt engineering.</p>
+                <form class="cta-form">
+                    <input type="email" class="cta-input" placeholder="Enter your email" required>
+                    <button type="submit" class="cta-btn">Join Waitlist</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cards Flow Section -->
+    <section class="cards-flow" id="cards">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-subtitle">Visual Composition</span>
+                <h2 class="section-title">Drag, Drop, and Connect Prompt Components</h2>
+                <p class="section-description">Build prompts visually with reusable, categorized components instead of struggling with text-only editors. Create, test, and refine with precision.</p>
+            </div>
+            <div class="cards-container">
+                <div class="prompt-card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: rgba(150, 91, 246, 0.2);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 6L9 17L4 12" stroke="#965bf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="card-title">Role Definition</div>
+                    </div>
+                    <div class="card-content">
+                        You are a marketing expert with 15+ years of experience in creating compelling brand narratives and viral campaigns.
+                    </div>
+                </div>
+                <div class="prompt-card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: rgba(96, 165, 250, 0.2);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 6V12L16 14M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2Z" stroke="#60A5FA" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="card-title">Behavioral Constraint</div>
+                    </div>
+                    <div class="card-content">
+                        Always provide concise advice in 3 bullet points with action items. Be specific and solution-oriented.
+                    </div>
+                </div>
+                <div class="prompt-card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: rgba(52, 211, 153, 0.2);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 12H15M12 9V15M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="#34D399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="card-title">Knowledge Context</div>
+                    </div>
+                    <div class="card-content">
+                        Use best practices from direct response marketing, focusing on AIDA framework and emotional triggers.
+                    </div>
+                </div>
+                <div class="prompt-card">
+                    <div class="card-header">
+                        <div class="card-icon" style="background: rgba(249, 168, 212, 0.2);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 15V17M12 7V13M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12C22 17.5228 17.5228 22 12 22Z" stroke="#F9A8D4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <div class="card-title">Evaluation Criteria</div>
+                    </div>
+                    <div class="card-content">
+                        Your response should be original, actionable, and directly address the customer's pain points with empathy.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>: column;
+                gap: 3rem;
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .process-steps::before {
+                display: none;
+            }
+
+            .metrics-content {
+                flex-direction
