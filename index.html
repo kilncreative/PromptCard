@@ -1182,8 +1182,132 @@
             function float(element, duration, delay) {
                 element.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
             }
-        });
-        
+
+            // --- Waitlist Modal Logic ---
+            const waitlistForm = document.querySelector('#waitlist-form');
+            const emailInput = document.querySelector('#email-input');
+            const formMessage = document.querySelector('#form-message');
+            const modalForm = document.querySelector('#modal-form');
+            const modalMessage = document.querySelector('#modal-message');
+            let submittedEmail = '';
+
+            function showModal() {
+                const modal = document.querySelector('#waitlist-modal');
+                modal.style.display = 'block';
+            }
+
+            function closeModal() {
+                const modal = document.querySelector('#waitlist-modal');
+                modal.style.display = 'none';
+            }
+
+            document.querySelector('#waitlist-modal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeModal();
+                }
+            });
+
+            // Handle Step 1: Email Submission
+            waitlistForm.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                formMessage.textContent = 'Submitting...';
+                const email = emailInput.value;
+                const submitButton = waitlistForm.querySelector('button[type="submit"]');
+                submitButton.disabled = true; // Disable button during submission
+
+                if (!email) {
+                    formMessage.textContent = 'Please enter a valid email.';
+                    submitButton.disabled = false;
+                    return;
+                }
+
+                // *** USE YOUR DEPLOYED WEB APP URL HERE ***
+                const webAppUrl = 'https://script.google.com/macros/s/AKfycbz9r3_FPhfyjD2O6WoEkWtG2LjJyWuY2swdIUZOFfwLDyxi0zf6r6X_gyoBBLB9uXPd/exec'; // Updated URL
+
+                fetch(webAppUrl, {
+                    method: 'POST',
+                    mode: 'cors', // Required for cross-origin requests from browser to Apps Script
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    // Apps Script expects the payload directly, not stringified within another object
+                    body: JSON.stringify({ email: email }),
+                    // Redirect handling might be needed depending on Apps Script version/setup
+                    // redirect: 'follow',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Step 1 Success:', data);
+                    if (data.status === 'success' || data.message === "Email already on waitlist.") {
+                        formMessage.textContent = ''; // Clear message
+                        showModal(); // Show modal on success
+                        waitlistForm.reset(); // Clear the email input field
+                    } else {
+                         formMessage.textContent = data.message || 'Submission failed. Please try again.';
+                    }
+                })
+                .catch((error) => {
+                    console.error('Step 1 Error:', error);
+                    formMessage.textContent = 'Submission failed. Check console for details.';
+                })
+                .finally(() => {
+                    submitButton.disabled = false; // Re-enable button
+                });
+            });
+
+
+            // Handle Step 2: Modal Form Submission
+            modalForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                modalMessage.textContent = 'Submitting details...';
+                const submitButton = modalForm.querySelector('button[type="submit"]');
+                submitButton.disabled = true; // Disable button
+
+                const formData = new FormData(modalForm);
+                const answers = {
+                    email: submittedEmail, // Include the original email
+                    workingOn: formData.get('workingOn'),
+                    currentApproach: formData.get('currentApproach'),
+                    frustration: formData.get('frustration'),
+                    wishAbility: formData.get('wishAbility'),
+                };
+
+                 // *** USE YOUR DEPLOYED WEB APP URL HERE (Same URL as Step 1) ***
+                 const webAppUrl = 'https://script.google.com/macros/s/AKfycbz9r3_FPhfyjD2O6WoEkWtG2LjJyWuY2swdIUZOFfwLDyxi0zf6r6X_gyoBBLB9uXPd/exec'; // Updated URL
+
+                 fetch(webAppUrl, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(answers),
+                    // redirect: 'follow',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Step 2 Success:', data);
+                     if (data.status === 'success' || data.status === 'warning') {
+                        modalMessage.textContent = 'Thank you for the details!';
+                        setTimeout(closeModal, 1500); // Close modal after a delay
+                     } else {
+                         modalMessage.textContent = data.message || 'Submission failed. Please try again.';
+                     }
+                })
+                .catch((error) => {
+                    console.error('Step 2 Error:', error);
+                     modalMessage.textContent = 'Submission failed. Check console for details.';
+                })
+                .finally(() => {
+                    submitButton.disabled = false; // Re-enable button
+                });
+            });
+
+
+        }); // End of DOMContentLoaded listener
+
         // Define float animation keyframes in JavaScript
         const styleSheet = document.createElement('style');
         styleSheet.textContent = `
